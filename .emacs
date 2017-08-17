@@ -5,6 +5,8 @@
     (("gnu" . "http://elpa.gnu.org/packages/")
      ("melpa-stable" . "http://stable.melpa.org/packages/")))))
 
+(prefer-coding-system 'utf-8)
+
 (require 'cl-lib)
 
 (load-theme 'misterioso)
