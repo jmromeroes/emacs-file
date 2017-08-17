@@ -41,6 +41,13 @@
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
+(defun find-user-init-file ()
+  "Edit the `user-init-file', in another window."
+  (interactive)
+  (find-file-other-window user-init-file))
+
+(global-set-key (kbd "C-c I") 'find-user-init-file)
+
 (add-to-list 'load-path "C:/Users/jromero/.emacs.d/elpa/neotree/")
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
