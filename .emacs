@@ -82,3 +82,19 @@
 
 ;; Selection will be removed on typing
 (delete-selection-mode 1)
+
+;;magit configuration
+(global-set-key (kbd "C-x g") 'magit-status)
+
+;;this is useful to go to previous buffer
+(defun switch-to-previous-buffer ()
+  "Switch to previously open buffer.
+Repeated invocations toggle between the two most recently open buffers."
+  (interactive)
+  (switch-to-buffer (other-buffer (current-buffer) 1)))
+
+;;Key chord mode configuration
+(add-to-list 'load-path "~/.emacs.d/elpa/key-chord/")
+(require 'key-chord)
+(key-chord-mode 1)
+(key-chord-define-global "SP" 'switch-to-previous-buffer)
