@@ -1,5 +1,10 @@
 (require 'package)
 (custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(inhibit-startup-screen t)
  '(package-archives
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
@@ -50,18 +55,30 @@
 
 (global-set-key (kbd "C-c I") 'find-user-init-file)
 
-(add-to-list 'load-path "C:/Users/jromero/.emacs.d/elpa/neotree/")
+(add-to-list 'load-path "~/.emacs.d/elpa/neotree/")
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
-(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
-(add-to-list 'load-path "C:/Users/jromero/.emacs.d/elpa/")
-(require 'font-lock+)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 
-(add-to-list 'load-path "C:/Users/jromero/.emacs.d/elpa/all-the-icons.el/")
-(require 'all-the-icons)
-(add-to-list 'load-path "C:/Users/jromero/.emacs.d/elpa/")
-(require 'font-lock+)
+;;
+;; ace jump mode major function
+;; 
+(autoload
+  'ace-jump-mode
+  "ace-jump-mode"
+  "Emacs quick move minor mode"
+  t)
+;; you can select the key you prefer to
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 
-(add-to-list 'load-path "C:/Users/jromero/.emacs.d/elpa/all-the-icons.el/")
-(require 'all-the-icons)
+;; Configuration for expand-region library
+(global-set-key (kbd "C-=") 'er/expand-region)
+
+;; Selection will be removed on typing
+(delete-selection-mode 1)
