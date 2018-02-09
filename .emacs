@@ -98,3 +98,23 @@ Repeated invocations toggle between the two most recently open buffers."
 (require 'key-chord)
 (key-chord-mode 1)
 (key-chord-define-global "SP" 'switch-to-previous-buffer)
+(put 'upcase-region 'disabled nil)
+
+;;Rest client configuration
+(add-to-list 'load-path "~/.emacs.d/elpa/restclient.el/")
+(require 'restclient)
+
+;;Yafolding configuration
+(add-to-list 'load-path "~/.emacs.d/elpa/yafolding/")
+(require 'yafolding)
+(defvar yafolding-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<C-S-return>") 'yafolding-hide-parent-element)
+    (define-key map (kbd "<C-M-return>") 'yafolding-toggle-all)
+    (define-key map (kbd "<C-return>")  'yafolding-toggle-element)
+    map))
+
+(add-to-list 'load-path "~/.emacs.d/elpa/json-reformat/")
+(add-to-list 'load-path "~/.emacs.d/elpa/json-snatcher/")
+(add-to-list 'load-path "~/.emacs.d/elpa/json-mode/")
+(require 'json-mode)
