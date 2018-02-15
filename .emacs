@@ -149,3 +149,11 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
 (global-git-gutter-mode +1)
 (custom-set-variables
  '(git-gutter:update-interval 2))
+
+;;Dash (dependency for Smartparens)
+(add-to-list 'load-path "~/.emacs.d/elpa/dash.el/")
+
+;;Smartparens
+(add-to-list 'load-path "~/.emacs.d/elpa/smartparens-1.11.0/")
+(require 'smartparens)
+(smartparens-global-mode t)
