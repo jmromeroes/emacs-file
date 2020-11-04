@@ -1,20 +1,47 @@
-(require 'package)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(git-gutter:update-interval 2)
  '(inhibit-startup-screen t)
  '(package-archives
-   (quote
-    (("gnu" . "http://elpa.gnu.org/packages/")
-     ("melpa-stable" . "http://stable.melpa.org/packages/")))))
+   '(("gnu" . "http://elpa.gnu.org/packages/")
+     ("melpa-stable" . "http://stable.melpa.org/packages/")))
+ '(package-selected-packages
+   '(pyvenv flymake-python-pyflakes py-autopep8 jedi elpy smartparens neotree ace-jump-mode scala-mode multiple-cursors ebal haskell-mode elm-mode all-the-icons)))
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
 (prefer-coding-system 'utf-8)
 
 (require 'cl-lib)
 
-(load-theme 'misterioso)
+;; For MacOS
+(when (string= system-type "darwin")       
+  (setq dired-use-ls-dired nil))
+
+;; First you should install all-the-icons package and run "M-x all-the-icons-install-fonts" and download font-lock+.el to ~/emacs.d/lisp
+(load "font-lock+")
+(require 'font-lock)
+(require 'font-lock+)
+(use-package all-the-icons)
+(use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+(add-hook 'emacs-startup-hook
+  (lambda ()
+    (load-theme 'misterioso)
+    ))
+
+(setq ns-alternate-modifier 'meta)
+(setq ns-right-alternate-modifier 'none)
 
 (defun move-line (n)
   "Move the current line up or down by N lines."
@@ -55,8 +82,9 @@
 
 (global-set-key (kbd "C-c I") 'find-user-init-file)
 
-(add-to-list 'load-path "~/.emacs.d/elpa/neotree/")
+;; Loading and setting Neotree
 (require 'neotree)
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 (global-set-key [f8] 'neotree-toggle)
 
 (custom-set-faces
@@ -66,94 +94,28 @@
  ;; If there is more than one, they won't work right.
  )
 
-;;
-;; ace jump mode major function
-;; 
-(autoload
-  'ace-jump-mode
-  "ace-jump-mode"
-  "Emacs quick move minor mode"
-  t)
-;; you can select the key you prefer to
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+;; Elpy 
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
 
-;; Configuration for expand-region library
-(global-set-key (kbd "C-=") 'er/expand-region)
+;; Fixing bug for jump to definition
+(defun elpy--xref-backend ()
+  "Return the name of the elpy xref backend."
+  (if (or (and (not (elpy-rpc--process-buffer-p elpy-rpc--buffer))
+               (elpy-rpc--get-rpc-buffer))
+          elpy-rpc--jedi-available)
+      'elpy
+    nil))
+(setq elpy-rpc-backend "jedi")
 
-;; Selection will be removed on typing
-(delete-selection-mode 1)
+;; Adding path to virtualenv
+(setq elpy-rpc-virtualenv-path "~/Documents/deeplearning/machine-learning-platform/mlp_backend/mlp-env/")
 
-;;magit configuration
-(global-set-key (kbd "C-x g") 'magit-status)
+;; Disable annoying notifications
+(setq ring-bell-function 'ignore)
 
-;;this is useful to go to previous buffer
-(defun switch-to-previous-buffer ()
-  "Switch to previously open buffer.
-Repeated invocations toggle between the two most recently open buffers."
-  (interactive)
-  (switch-to-buffer (other-buffer (current-buffer) 1)))
-
-;;Key chord mode configuration
-(add-to-list 'load-path "~/.emacs.d/elpa/key-chord/")
-(require 'key-chord)
-(key-chord-mode 1)
-(key-chord-define-global "SP" 'switch-to-previous-buffer)
-(put 'upcase-region 'disabled nil)
-
-;;Rest client configuration
-(add-to-list 'load-path "~/.emacs.d/elpa/restclient.el/")
-(require 'restclient)
-
-;;Yafolding configuration
-(add-to-list 'load-path "~/.emacs.d/elpa/yafolding/")
-(require 'yafolding)
-(defvar yafolding-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "<C-S-return>") 'yafolding-hide-parent-element)
-    (define-key map (kbd "<C-M-return>") 'yafolding-toggle-all)
-    (define-key map (kbd "<C-return>")  'yafolding-toggle-element)
-    map))
-
-(add-to-list 'load-path "~/.emacs.d/elpa/json-reformat/")
-(add-to-list 'load-path "~/.emacs.d/elpa/json-snatcher/")
-(add-to-list 'load-path "~/.emacs.d/elpa/json-mode/")
-(require 'json-mode)
-
-(defvar blink-cursor-colors (list  "#92c48f" "#6785c5" "#be369c" "#d9ca65")
-  "On each blink the cursor will cycle to the next color in this list.")
-
-(setq blink-cursor-count 0)
-(defun blink-cursor-timer-function ()
-  "Zarza wrote this cyberpunk variant of timer `blink-cursor-timer'. 
-Warning: overwrites original version in `frame.el'.
-
-This one changes the cursor color on each blink. Define colors in `blink-cursor-colors'."
-  (when (not (internal-show-cursor-p))
-    (when (>= blink-cursor-count (length blink-cursor-colors))
-      (setq blink-cursor-count 0))
-    (set-cursor-color (nth blink-cursor-count blink-cursor-colors))
-    (setq blink-cursor-count (+ 1 blink-cursor-count))
-    )
-  (internal-show-cursor nil (not (internal-show-cursor-p)))
-  )
-
-;;Nyan cat
-(add-to-list 'load-path "~/.emacs.d/elpa/nyan-mode/")
-(require 'nyan-mode)
-(nyan-mode)
-(nyan-start-animation)
-
-;;Git Gutter
-(add-to-list 'load-path "~/.emacs.d/elpa/git-gutter-0.90/")
-(require 'git-gutter)
-(global-git-gutter-mode +1)
-(custom-set-variables
- '(git-gutter:update-interval 2))
-
-;;Dash (dependency for Smartparens)
-(add-to-list 'load-path "~/.emacs.d/elpa/dash.el/")
-
-;;Smartparens
-(add-to-list 'load-path "~/.emacs.d/elpa/smartparens-1.11.0/")
-(require 'smartparens)
-(smartparens-global-mode t)
+;; Adding line numbers in the file
+(when (version<= "26.0.50" emacs-version )
+  (global-display-line-numbers-mode))
